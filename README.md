@@ -21,11 +21,11 @@ npm run preview
 ## Probar el recorrido
 
 1. Editá la descripción precargada del lavarropas y, si querés, agregá una foto/video simulado.
-2. Respondé las tres preguntas. Para el caso del PDF, elegí **Sí / No / No**. También podés elegir **No sé**.
+2. Respondé las tres preguntas. Para el caso del PDF, elegí **Sí / No / No se**.
 3. Revisá el resumen y las advertencias, y compará las cuatro alternativas.
 4. Entrá en un detalle y elegí ese paso para ver su cierre específico. Volvé a las alternativas para cambiar la decisión.
 
-Las respuestas **Sí / No / No** sugieren una comprobación básica; un código de error orienta al manual; un ruido, olor o comportamiento diferente orienta a un técnico; las dudas o un ciclo incompleto orientan a pedir ayuda. Son reglas predefinidas para la prueba, sin diagnóstico técnico.
+Las respuestas **Sí / No / No se** sugieren una comprobación básica; un código de error orienta al manual; un ruido, olor o comportamiento diferente orienta a un técnico; las dudas o un ciclo incompleto orientan a pedir ayuda. Son reglas predefinidas para la prueba, sin diagnóstico técnico.
 
 Los datos se conservan al navegar y al recargar en la misma pestaña mediante `sessionStorage`. Cerrá la pestaña para comenzar una nueva sesión. Las fotos/videos son adjuntos simulados: no se accede a la cámara ni se suben archivos. No se envían datos, se contactan personas ni se consultan servicios externos.
 
