@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { alternatives, detailLabels, observations, questions, recommendation } from './content'
+import { alternatives, confirmations, detailLabels, observations, questions } from './content'
 import type { Alternative, Choice } from './content'
 import './styles.css'
 
@@ -9,7 +9,7 @@ const initial: State = { step: 1, description: 'El lavarropas termina el ciclo p
 function restore(): State {
   try {
     const saved = JSON.parse(sessionStorage.getItem('dpbt-journey') || 'null')
-    if (saved && Number.isInteger(saved.step) && saved.step >= 1 && saved.step <= 7 && typeof saved.description === 'string' && Array.isArray(saved.answers) && saved.answers.length === 3 && saved.answers.every((a: unknown) => a === null || ['Sí', 'No', 'No sé'].includes(a as string)) && Object.hasOwn(alternatives, saved.selected)) return { ...initial, ...saved }
+    if (saved && Number.isInteger(saved.step) && saved.step >= 1 && saved.step <= 9 && typeof saved.description === 'string' && Array.isArray(saved.answers) && saved.answers.length === 3 && saved.answers.every((a: unknown) => a === null || ['Sí', 'No', 'No sé'].includes(a as string)) && Object.hasOwn(alternatives, saved.selected)) return { ...initial, ...saved }
   } catch { /* Storage is optional. */ }
   return initial
 }
@@ -28,13 +28,13 @@ function App() {
   }, [step, selected])
   const notes = observations(answers)
   const back = () => go(step - 1)
-  const title = ['¿Qué problema tenés en tu hogar?', 'Vamos a entender mejor la situación', 'Esto es lo que entendimos', 'Antes de intervenir', '¿Cómo podrías avanzar?', 'Compará antes de decidir', 'Tu próximo paso'][step - 1]
+  const title = ['¿Qué problema tenés en tu hogar?', 'Vamos a entender mejor la situación', 'Esto es lo que entendimos', 'Antes de intervenir', '¿Cómo podrías avanzar?', 'Compará antes de decidir', 'Tu próximo paso', 'Ya definiste tu próximo paso', 'Recorrido finalizado'][step - 1]
   const primary = (label: string, onClick: () => void, disabled = false) => <button className="primary" onClick={onClick} disabled={disabled}>{label}</button>
   const summary = <><p className="preserve">{description}</p>{notes.map(note => <p key={note}>{note}</p>)}{attachment && <p>Archivo adjunto: {attachment} (simulado).</p>}{actions.trim() && <p>Acciones realizadas: {actions}</p>}</>
   return <main className={`phone step-${step}`}>
     <header>
-      <div className="topline">{step < 3 ? <span>{step === 1 ? 'Inicio' : 'Preguntas'}</span> : <button className="back" onClick={back}>← Atrás</button>}<span>{step} de 7</span></div>
-      <div className="progress" role="progressbar" aria-label="Progreso del recorrido" aria-valuemin={1} aria-valuemax={7} aria-valuenow={step}>{Array.from({length:7}, (_,i) => <span key={i} className={i < step ? 'complete' : ''} />)}</div>
+      <div className="topline">{step < 3 ? <span>{step === 1 ? 'Inicio' : 'Preguntas'}</span> : <button className="back" onClick={back}>← Atrás</button>}<span>{step <= 7 ? `${step} de 7` : step === 8 ? 'Confirmación' : 'Cierre'}</span></div>
+      <div className="progress" role="progressbar" aria-label="Progreso del recorrido" aria-valuemin={1} aria-valuemax={7} aria-valuenow={Math.min(step, 7)}>{Array.from({length:7}, (_,i) => <span key={i} className={i < step ? 'complete' : ''} />)}</div>
     </header>
     <h1 tabIndex={-1} ref={heading}>{title}</h1>
     {step === 1 && <>
@@ -50,8 +50,8 @@ function App() {
       <div className="button-stack">{primary('Continuar', () => go(3), answers.some(a => a === null))}<button onClick={back}>Atrás</button></div>
     </>}
     {step === 3 && <>
-      <section className="box"><p>Tu lavarropas:</p><ul>{notes.map(note => <li key={note}>{note.charAt(0).toLocaleLowerCase() + note.slice(1)}</li>)}</ul><p className="summary-description preserve">Lo que describiste: {description}</p>{attachment && <p>Foto o video agregado (simulado).</p>}</section>
-      <p className="spaced">Todavía no podemos determinar con certeza cuál es la causa. Antes de decidir qué hacer, revisemos qué acciones tienen sentido y cuáles conviene evitar.</p>
+      <section className="box"><h2>Lo que sabemos</h2><ul>{notes.map((note, i) => <React.Fragment key={note}><li>{note}</li>{i === 0 && description === initial.description && <li>Quedó agua dentro del tambor.</li>}</React.Fragment>)}</ul><p className="summary-description preserve">Lo que describiste: {description}</p>{attachment && <p>Foto o video agregado (simulado).</p>}</section>
+      <section className="box"><h2>Lo que todavía no sabemos</h2><ul><li>No podemos determinar con certeza cuál es la causa del problema.</li><li>Puede ser necesario obtener más información antes de decidir si conviene intervenir.</li></ul></section>
       <div className="button-stack"><button onClick={() => go(2)}>Corregir información</button>{primary('Continuar', () => go(4))}</div>
     </>}
     {step === 4 && <>
@@ -61,7 +61,7 @@ function App() {
       {primary('Ver mis opciones', () => go(5))}
     </>}
     {step === 5 && <>
-      <section className="box recommendation"><h2>Recomendación</h2><p>{recommendation(answers)}</p></section>
+      <p>Según la información disponible, estas son algunas formas en las que podrías avanzar. Podés elegir la que consideres más adecuada para tu situación y cambiar de decisión en cualquier momento.</p>
       <div className="alternatives">{(Object.keys(alternatives) as Alternative[]).map(key => <button className="alternative" key={key} onClick={() => choose(key)}><span><strong>{alternatives[key].title}</strong><span>{alternatives[key].description}</span></span><span aria-hidden="true">›</span></button>)}</div>
     </>}
     {step === 6 && <>
@@ -95,9 +95,21 @@ function App() {
       </>}
       <div className="bottom button-stack">
         {selected === 'basic' && <>{primary(started ? 'Comprobación iniciada' : 'Comenzar comprobación', () => patch({started:true}), started)}<button onClick={() => choose('guidance')}>Prefiero pedir orientación</button><button onClick={() => choose('technician')}>Contactar a un técnico</button></>}
+        {selected === 'model' && <button onClick={() => choose('basic')}>Hacer una comprobación básica</button>}
+        {selected === 'guidance' && <button onClick={() => choose('technician')}>Contactar a un técnico</button>}
+        {primary('Definir mi próximo paso', () => go(8))}
         <button onClick={() => go(5)}>Volver a las alternativas</button>
         <p className="muted footnote">Podés cambiar de decisión en cualquier momento.</p>
       </div>
+    </>}
+    {step === 8 && <>
+      <section className="box"><p>{confirmations[selected]}</p></section>
+      <p>Podés volver y elegir otra alternativa si cambia la situación o si necesitás explorar otra forma de avanzar.</p>
+      <div className="bottom button-stack">{primary('Finalizar', () => go(9))}<button onClick={() => go(5)}>Volver a las alternativas</button></div>
+    </>}
+    {step === 9 && <>
+      <p>Ya tenés un próximo paso definido. Si la situación cambia, podés volver a evaluar tus alternativas.</p>
+      <div className="bottom button-stack"><button onClick={() => go(5)}>Volver a las alternativas</button></div>
     </>}
   </main>
 }

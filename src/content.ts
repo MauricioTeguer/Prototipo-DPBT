@@ -1,7 +1,7 @@
 export type Choice = 'Sí' | 'No' | 'No sé'
 export type Alternative = 'basic' | 'model' | 'guidance' | 'technician'
 export const questions = [
-  '¿El lavarropas terminó el ciclo normalmente?',
+  '¿El lavarropas indicó que el ciclo había terminado?',
   '¿Aparece algún código o mensaje de error?',
   '¿Notaste algún ruido, olor o comportamiento diferente?',
 ]
@@ -30,14 +30,14 @@ export const alternatives: Record<Alternative, { title: string; description: str
 export const detailLabels = ['Nivel de conocimiento necesario', 'Herramientas necesarias', 'Riesgo de intervención', 'Tiempo/esfuerzo', 'Cuándo podría ser conveniente']
 export function observations(answers: (Choice | null)[]) {
   return [
-    answers[0] === 'Sí' ? 'Finalizó el ciclo normalmente.' : answers[0] === 'No' ? 'No finalizó el ciclo normalmente.' : 'No sabés si el ciclo terminó normalmente.',
-    answers[1] === 'Sí' ? 'Reportaste un código o mensaje de error.' : answers[1] === 'No' ? 'No muestra un código de error.' : 'No sabés si muestra un código de error.',
-    answers[2] === 'Sí' ? 'Reportaste ruido, olor o un comportamiento diferente.' : answers[2] === 'No' ? 'No reportaste olor ni ruido inusual.' : 'No sabés si hubo ruido, olor o un comportamiento diferente.',
+    answers[0] === 'Sí' ? 'El lavarropas indicó que el ciclo terminó.' : answers[0] === 'No' ? 'El lavarropas no indicó que el ciclo terminó.' : 'No sabés si el lavarropas indicó que el ciclo había terminado.',
+    answers[1] === 'Sí' ? 'Reportaste un código o mensaje de error.' : answers[1] === 'No' ? 'No apareció un código de error.' : 'No sabés si muestra un código de error.',
+    answers[2] === 'Sí' ? 'Reportaste ruido, olor o un comportamiento diferente.' : answers[2] === 'No' ? 'No se detectaron ruidos u olores inusuales.' : 'No sabés si hubo ruido, olor o un comportamiento diferente.',
   ]
 }
-export function recommendation(answers: (Choice | null)[]): string {
-  if (answers[2] === 'Sí') return 'Como notaste un ruido, olor o comportamiento diferente, conviene detener las comprobaciones y contactar a un técnico para una evaluación profesional.'
-  if (answers[1] === 'Sí') return 'Como aparece un código o mensaje de error, podés comenzar por buscar información del modelo y consultar su manual. Si no comprendés las indicaciones, podés pedir orientación.'
-  if (answers.includes('No sé') || answers[0] === 'No') return 'Como hay información que todavía no está clara, podés pedir orientación y compartir lo que observaste antes de decidir si realizar alguna comprobación.'
-  return 'Según la información que brindaste, podés comenzar por una comprobación básica que no requiera desarmar el equipo. Si no obtenés información suficiente, podés detenerte y elegir otra alternativa.'
+export const confirmations: Record<Alternative, string> = {
+  basic: 'Elegiste hacer una comprobación básica que no requiere desarmar el lavarropas.',
+  model: 'Elegiste buscar información del modelo para consultar información específica de tu lavarropas.',
+  guidance: 'Elegiste pedir orientación para pensar cómo avanzar con alguien de confianza o con experiencia.',
+  technician: 'Elegiste contactar a un técnico para obtener una evaluación profesional.',
 }

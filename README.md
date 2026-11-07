@@ -21,11 +21,12 @@ npm run preview
 ## Probar el recorrido
 
 1. Editá la descripción precargada del lavarropas y, si querés, agregá una foto/video simulado.
-2. Respondé las tres preguntas. Para el caso del PDF, elegí **Sí / No / No se**.
+2. Respondé las tres preguntas. Para el caso del PDF, elegí **Sí / No / No**.
 3. Revisá el resumen y las advertencias, y compará las cuatro alternativas.
-4. Entrá en un detalle y elegí ese paso para ver su cierre específico. Volvé a las alternativas para cambiar la decisión.
+4. Entrá en una comparación y elegí ese paso. Desde «Tu próximo paso», podés continuar con otra alternativa o pulsar «Definir mi próximo paso» para ver su confirmación.
+5. Pulsá «Finalizar» para llegar a «Recorrido finalizado». Desde la confirmación y el cierre podés volver a las alternativas.
 
-Las respuestas **Sí / No / No se** sugieren una comprobación básica; un código de error orienta al manual; un ruido, olor o comportamiento diferente orienta a un técnico; las dudas o un ciclo incompleto orientan a pedir ayuda. Son reglas predefinidas para la prueba, sin diagnóstico técnico.
+Las cuatro alternativas se presentan sin una recomendación automática. El resumen distingue lo que sabemos de lo que todavía no sabemos y se actualiza al corregir las respuestas. Se puede continuar de información del modelo a comprobación básica, de comprobación básica a orientación y de orientación a técnico, pasando por la comparación correspondiente.
 
 Los datos se conservan al navegar y al recargar en la misma pestaña mediante `sessionStorage`. Cerrá la pestaña para comenzar una nueva sesión. Las fotos/videos son adjuntos simulados: no se accede a la cámara ni se suben archivos. No se envían datos, se contactan personas ni se consultan servicios externos.
 
@@ -33,7 +34,7 @@ Se conserva el diseño de baja fidelidad, los textos y la estructura de siete pa
 
 ## Verificación
 
-Las pruebas recorren las cuatro ramas, los cambios de decisión, el estado al volver/recargar, los campos editables, los adjuntos simulados, las recomendaciones y los anchos de 320, 390, 768 y 1440 px.
+Las pruebas recorren las cuatro ramas, los cambios de decisión, el estado al volver/recargar, los campos editables, los adjuntos simulados, las confirmaciones, el cierre, las conexiones entre alternativas y los anchos de 320, 390, 768 y 1440 px.
 
 ```sh
 npm run test:e2e
